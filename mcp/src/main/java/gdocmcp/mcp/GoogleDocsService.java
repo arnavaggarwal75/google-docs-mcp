@@ -22,14 +22,21 @@ public class GoogleDocsService {
     @PostConstruct
     public void init() {
         try {
+            String path = System.getenv("GOOGLE_TOKEN_PATH");
+            log.info("Initializing GoogleTokenManager with path: {}", path);
             this.tokenManager = new GoogleTokenManager();
+            log.info("GoogleTokenManager initialized successfully.");
         } catch (Exception e) {
-            System.out.println("Unable to init google token manager");
+            log.error("Unable to init GoogleTokenManager: {}", e.getMessage(), e);
         }
     }
 
     @Tool(name = "create_doc", description = "Creates a new Google Doc with a title")
     public String createDoc(String title) throws Exception {
+        if (tokenManager == null) {
+            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file.";
+        }
+
         String token = tokenManager.getAccessToken();
 
         String body = String.format("{\"title\": \"%s\"}", title);
@@ -45,14 +52,17 @@ public class GoogleDocsService {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        return response.body(); // or extract docId from JSON
+        return response.body(); // You can also parse and return the documentId here
     }
 
     @Tool(name = "append_to_doc", description = "Appends text to an existing Google Doc")
     public String appendToDoc(String docId, String text) throws Exception {
+        if (tokenManager == null) {
+            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file.";
+        }
+
         String token = tokenManager.getAccessToken();
 
-        // Format Google Docs API "insertText" request
         String body = String.format("""
             {
               "requests": [
@@ -84,6 +94,10 @@ public class GoogleDocsService {
 
     @Tool(name = "read_doc", description = "Reads text content from a Google Doc")
     public String readDoc(String docId) throws Exception {
+        if (tokenManager == null) {
+            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file.";
+        }
+
         String token = tokenManager.getAccessToken();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -95,7 +109,6 @@ public class GoogleDocsService {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // (Optional) parse response to return just the text content
         return response.body();
     }
 

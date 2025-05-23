@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.net.URI;
 import java.net.http.*;
-import java.time.Instant;
 import java.util.*;
 
 public class GoogleTokenManager {
@@ -19,23 +18,26 @@ public class GoogleTokenManager {
             ? envPath
             : System.getProperty("user.home") + "/.gdocs-tokens.json";
 
+        System.out.println("[GoogleTokenManager] Loading tokens from: " + path);
+
         this.tokenFile = new File(path);
         if (!tokenFile.exists()) {
             throw new IllegalStateException("Token file not found: " + tokenFile.getAbsolutePath());
         }
 
-        tokenData = MAPPER.readValue(tokenFile, Map.class);
+        try {
+            tokenData = MAPPER.readValue(tokenFile, Map.class);
+        } catch (Exception e) {
+            System.out.println("[GoogleTokenManager] Failed to parse token file: " + e.getMessage());
+            throw e;
+        }
     }
 
-    public String getAccessToken() throws Exception {
-        Instant expiry = Instant.parse((String) tokenData.get("expiry_time"));
-        if (Instant.now().isAfter(expiry.minusSeconds(60))) {
-            refreshAccessToken();
-        }
+    public String getAccessToken() {
         return (String) tokenData.get("access_token");
     }
 
-    private void refreshAccessToken() throws Exception {
+    public void refreshAccessToken() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
 
         Map<Object, Object> params = new LinkedHashMap<>();
@@ -59,7 +61,9 @@ public class GoogleTokenManager {
 
         Map<String, Object> newToken = MAPPER.readValue(response.body(), Map.class);
         tokenData.put("access_token", newToken.get("access_token"));
-        tokenData.put("expiry_time", Instant.now().plusSeconds((Integer) newToken.get("expires_in")).toString());
+
+        // optionally log
+        System.out.println("[GoogleTokenManager] Refreshed access token");
 
         MAPPER.writeValue(tokenFile, tokenData);
     }
