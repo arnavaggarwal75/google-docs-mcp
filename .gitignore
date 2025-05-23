@@ -33,3 +33,4 @@ build/
 .vscode/
 
 mcp/src/main/resources/credentials.json
+mcp-client/mcp-client/node_modules/
