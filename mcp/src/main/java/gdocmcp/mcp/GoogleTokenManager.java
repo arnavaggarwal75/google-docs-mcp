@@ -1,3 +1,5 @@
+package gdocmcp.mcp;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.net.URI;

@@ -1,1 +1,2 @@
-./mvnw spring-boot:run
+./mvnw clean package -q
+java -jar target/mcp-0.0.1-SNAPSHOT.jar
