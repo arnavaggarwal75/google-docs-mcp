@@ -9,13 +9,22 @@ import java.util.*;
 
 public class GoogleTokenManager {
 
-    private static final String TOKEN_PATH = System.getProperty("user.home") + "/.gdocs-tokens.json";
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
+    private final File tokenFile;
     private Map<String, Object> tokenData;
 
     public GoogleTokenManager() throws Exception {
-        tokenData = MAPPER.readValue(new File(TOKEN_PATH), Map.class);
+        String envPath = System.getenv("GOOGLE_TOKEN_PATH");
+        String path = (envPath != null && !envPath.isBlank())
+            ? envPath
+            : System.getProperty("user.home") + "/.gdocs-tokens.json";
+
+        this.tokenFile = new File(path);
+        if (!tokenFile.exists()) {
+            throw new IllegalStateException("Token file not found: " + tokenFile.getAbsolutePath());
+        }
+
+        tokenData = MAPPER.readValue(tokenFile, Map.class);
     }
 
     public String getAccessToken() throws Exception {
@@ -52,6 +61,6 @@ public class GoogleTokenManager {
         tokenData.put("access_token", newToken.get("access_token"));
         tokenData.put("expiry_time", Instant.now().plusSeconds((Integer) newToken.get("expires_in")).toString());
 
-        MAPPER.writeValue(new File(TOKEN_PATH), tokenData);
+        MAPPER.writeValue(tokenFile, tokenData);
     }
 }

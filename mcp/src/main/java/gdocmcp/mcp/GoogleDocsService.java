@@ -9,10 +9,25 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
 
-@Service
-public class GoogleDocsToolService {
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
-    private final GoogleTokenManager tokenManager = new GoogleTokenManager(); // your custom class to load/refresh tokens
+@Service
+public class GoogleDocsService {
+
+    private GoogleTokenManager tokenManager;
+
+    @PostConstruct
+    public void init() {
+        try {
+            this.tokenManager = new GoogleTokenManager();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize GoogleTokenManager", e);
+        }
+    }
 
     @Tool(name = "create_doc", description = "Creates a new Google Doc with a title")
     public String createDoc(String title) throws Exception {
