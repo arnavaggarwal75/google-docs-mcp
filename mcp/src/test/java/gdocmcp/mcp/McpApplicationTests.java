@@ -1,10 +1,10 @@
-package dev.arnav.google_docs_mcp;
+package gdocmcp.mcp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GoogleDocsMcpApplicationTests {
+class McpApplicationTests {
 
 	@Test
 	void contextLoads() {

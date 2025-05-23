@@ -1,13 +1,13 @@
-package dev.arnav.google_docs_mcp;
+package gdocmcp.mcp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GoogleDocsMcpApplication {
+public class McpApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GoogleDocsMcpApplication.class, args);
+		SpringApplication.run(McpApplication.class, args);
 	}
 
 }
