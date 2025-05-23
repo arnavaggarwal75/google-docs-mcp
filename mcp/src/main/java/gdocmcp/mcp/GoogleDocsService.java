@@ -19,13 +19,14 @@ import java.time.Duration;
 public class GoogleDocsService {
 
     private GoogleTokenManager tokenManager;
+    private static final Logger log = LoggerFactory.getLogger(GoogleDocsService.class);
 
     @PostConstruct
     public void init() {
         try {
             this.tokenManager = new GoogleTokenManager();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize GoogleTokenManager", e);
+            log.info("Unable to init google token manager");
         }
     }
 
