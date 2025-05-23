@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+
+mcp/src/main/resources/credentials.json
