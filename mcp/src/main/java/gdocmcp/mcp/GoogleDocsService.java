@@ -23,18 +23,22 @@ public class GoogleDocsService {
     public void init() {
         try {
             String path = System.getenv("GOOGLE_TOKEN_PATH");
-            log.info("Initializing GoogleTokenManager with path: {}", path);
+            log.info("[init] Using GOOGLE_TOKEN_PATH: {}", path);
+
             this.tokenManager = new GoogleTokenManager();
-            log.info("GoogleTokenManager initialized successfully.");
+
+            log.info("[init] GoogleTokenManager initialized successfully.");
         } catch (Exception e) {
-            log.error("Unable to init GoogleTokenManager: {}", e.getMessage(), e);
+            log.error("[init] GoogleTokenManager failed: {}", e.getMessage(), e);
+            // Show failure reason in fallback tool message
+            this.tokenManager = null;
         }
     }
 
     @Tool(name = "create_doc", description = "Creates a new Google Doc with a title")
     public String createDoc(String title) throws Exception {
         if (tokenManager == null) {
-            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file.";
+            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file. All env vars: " + System.getenv();
         }
 
         String token = tokenManager.getAccessToken();
