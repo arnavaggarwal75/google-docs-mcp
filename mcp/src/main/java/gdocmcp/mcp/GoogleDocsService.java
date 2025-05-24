@@ -13,21 +13,34 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 @Service
 public class GoogleDocsService {
 
-    private GoogleTokenManager tokenManager;
+    private Map<String, String> tokenManager;
     private static final Logger log = LoggerFactory.getLogger(GoogleDocsService.class);
 
     @PostConstruct
     public void init() {
         try {
-            String path = System.getenv("GOOGLE_TOKEN_PATH");
-            log.info("[init] Using GOOGLE_TOKEN_PATH: {}", path);
+            Dotenv dotenv = Dotenv.load();
 
-            this.tokenManager = new GoogleTokenManager();
+            String[] keys = {
+                "access_token",
+                "refresh_token",
+                "client_id",
+                "client_secret"
+            };
 
-            log.info("[init] GoogleTokenManager initialized successfully.");
+            for (String key : keys) {
+                String value = dotenv.get(key);
+                if (value == null) {
+                    throw new IllegalStateException("Missing .env value for: " + key);
+                }
+                tokenData.put(key, value);
+            }
+            
         } catch (Exception e) {
             log.error("[init] GoogleTokenManager failed: {}", e.getMessage(), e);
             // Show failure reason in fallback tool message
