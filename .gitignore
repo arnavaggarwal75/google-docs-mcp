@@ -32,7 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-mcp/src/main/resources/credentials.json
-mcp-client/mcp-client/node_modules/
-mcp/src/main/resources/stuff.txt
-mcp/src/main/java/gdocmcp/mcp/gdocstokens.json
+# Ignore confg
+.env
