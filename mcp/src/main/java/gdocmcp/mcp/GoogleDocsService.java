@@ -13,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class GoogleDocsService {
 
-    private static String token = "ya29.a0AW4Xtxje4HOQ_ktvYcl0bp3B4zx_KUHIp9C3ukH1WY5fXUN7gQYvmFtdttVen1ICwvQDy2rMoSPHJe1WO_z_eQM5taDkjtl6WExz3YiTFjoQ6bxhaL27gR2o7tPlNDS6L4b_TFCUwMVG7s_zgZtq80QhR1yjfXXkCQU-rdcNaCgYKAS4SARcSFQHGX2MiGeJBtXf4J7Z6tHLw81CgMQ0175";
+    private static String token = "";
 
     @PostConstruct
     public void init() {
