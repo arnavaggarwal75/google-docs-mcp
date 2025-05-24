@@ -3,55 +3,28 @@ package gdocmcp.mcp;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
+import jakarta.annotation.PostConstruct;
 @Service
 public class GoogleDocsService {
 
-    private Map<String, String> tokenManager;
+    private static String token = "ya29.a0AW4Xtxje4HOQ_ktvYcl0bp3B4zx_KUHIp9C3ukH1WY5fXUN7gQYvmFtdttVen1ICwvQDy2rMoSPHJe1WO_z_eQM5taDkjtl6WExz3YiTFjoQ6bxhaL27gR2o7tPlNDS6L4b_TFCUwMVG7s_zgZtq80QhR1yjfXXkCQU-rdcNaCgYKAS4SARcSFQHGX2MiGeJBtXf4J7Z6tHLw81CgMQ0175";
 
     @PostConstruct
     public void init() {
-        try {
-            Dotenv dotenv = Dotenv.load();
-
-            String[] keys = {
-                "ACCESS_TOKEN",
-                "REFRESH_TOKEN",
-                "CLIENT_ID",
-                "CLIENT_SECRET",
-            };
-
-            for (String key : keys) {
-                String value = dotenv.get(key);
-                if (value == null) {
-                    throw new IllegalStateException("Missing .env value for: " + key);
-                }
-                tokenManager.put(key, value);
-            }
-            
-        } catch (Exception e) {
-            System.out.println("[init] GoogleTokenManager failed: " + e.getMessage());
-            // Show failure reason in fallback tool message
-            this.tokenManager = null;
-        }
+        System.out.println(token + " is the token");
     }
 
     @Tool(name = "create_doc", description = "Creates a new Google Doc with a title")
     public String createDoc(String title) throws Exception {
-        if (tokenManager == null) {
-            return "ERROR: tokenManager is null ";
+        if (token == null) {
+            return "ERROR: access_token is null ";
         }
-
-        String token = tokenManager.get("ACCESS_TOKEN");
 
         String body = String.format("{\"title\": \"%s\"}", title);
 
@@ -71,11 +44,9 @@ public class GoogleDocsService {
 
     @Tool(name = "append_to_doc", description = "Appends text to an existing Google Doc")
     public String appendToDoc(String docId, String text) throws Exception {
-        if (tokenManager == null) {
-            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file.";
+        if (token == null) {
+            return "ERROR: access_token was not initialized";
         }
-
-        String token = tokenManager.get("ACCESS_TOKEN");
 
         String body = String.format("""
             {
@@ -108,11 +79,9 @@ public class GoogleDocsService {
 
     @Tool(name = "read_doc", description = "Reads text content from a Google Doc")
     public String readDoc(String docId) throws Exception {
-        if (tokenManager == null) {
-            return "ERROR: GoogleTokenManager was not initialized. Check GOOGLE_TOKEN_PATH and token file.";
+        if (token == null) {
+            return "ERROR: access_token not set.";
         }
-
-        String token = tokenManager.get("ACCESS_TOKEN");
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://docs.googleapis.com/v1/documents/" + docId))
