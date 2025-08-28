@@ -1,10 +1,20 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import Avatar from '../components/Avatar';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const credential = localStorage.getItem('google_credential');
+    if (!credential) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleSubmit = async () => {
     if (!videoUrl.trim()) return;
@@ -12,10 +22,19 @@ const Dashboard = () => {
     setNotes("");
 
     console.log("testing");
-    
+
     setLoading(false);
   };
 
+  // Get Google profile from localStorage
+  const profile = JSON.parse(localStorage.getItem('google_profile') || '{}');
+  const imageUrl = profile.picture || "https://www.gravatar.com/avatar/?d=mp";
+  const handleLogout = () => {
+    localStorage.removeItem('google_credential');
+    navigate('/');
+  };
+
+  const name = profile.name || "";
   useEffect(() => {
     const styleSheet = document.createElement("style");
     styleSheet.type = "text/css";
@@ -25,9 +44,13 @@ const Dashboard = () => {
       document.head.removeChild(styleSheet);
     };
   }, []);
-  
+
   return (
     <div className="container">
+      {/* Avatar in top right */}
+      <div className="avatarContainer">
+        <Avatar imageUrl={imageUrl || "https://www.gravatar.com/avatar/?d=mp"} onLogout={handleLogout} name={name} />
+      </div>
       <h1 className="title">AI Note Taker</h1>
       <h3 className="subtitle">Your personal AI assistant for video notes</h3>
       <input
@@ -76,6 +99,13 @@ const styles = `
     align-items: center;
     box-sizing: border-box;
     padding: 20px;
+    position: relative;
+  }
+  .avatarContainer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
   }
   .title {
     font-size: 24px;
